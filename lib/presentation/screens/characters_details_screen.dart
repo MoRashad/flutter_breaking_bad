@@ -1,7 +1,13 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_breaking_bad/constants/colors.dart';
+import 'dart:math';
 
-import 'package:flutter_breaking_bad/data/models/characters.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../business_logic/cubit/character_cubit.dart';
+import '../../constants/colors.dart';
+
+import '../../data/models/characters.dart';
+import '../../data/models/qoutes.dart';
 
 class CharacterDetailsScreen extends StatelessWidget {
   const CharacterDetailsScreen({
@@ -9,7 +15,6 @@ class CharacterDetailsScreen extends StatelessWidget {
     required this.character,
   }) : super(key: key);
   final Character character;
-
   Widget buildSliverAppBar(BuildContext context) {
     return SliverAppBar(
       expandedHeight: MediaQuery.of(context).size.height * 0.8, //600,
@@ -67,8 +72,53 @@ class CharacterDetailsScreen extends StatelessWidget {
     );
   }
 
+  Widget checkIfQuotesAreLoaded(CharacterState state) {
+    if (state is QuotesLoaded) {
+      return displayRandomQuoteOrEmptySpace(state);
+    } else {
+      return showProgressIndicator();
+    }
+  }
+
+  Widget showProgressIndicator() {
+    return const Center(
+      child: CircularProgressIndicator(
+        color: MyColors.yellow,
+      ),
+    );
+  }
+
+  Widget displayRandomQuoteOrEmptySpace(state) {
+    var quotes = (state).quotes;
+    if (quotes.length != 0) {
+      int randomQuoteIndex = Random().nextInt(quotes.length - 1);
+      return Center(
+        child: DefaultTextStyle(
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 20,
+            color: MyColors.white,
+            shadows: [
+              Shadow(
+                blurRadius: 7,
+                color: MyColors.yellow,
+                offset: Offset(0, 0),
+              )
+            ],
+          ),
+          child: AnimatedTextKit(repeatForever: true, animatedTexts: [
+            FlickerAnimatedText(quotes[randomQuoteIndex].quote),
+          ]),
+        ),
+      );
+    } else {
+      return Container();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    BlocProvider.of<CharacterCubit>(context).getQuotes(character.name);
     return Scaffold(
       backgroundColor: MyColors.grey,
       body: CustomScrollView(
@@ -103,6 +153,11 @@ class CharacterDetailsScreen extends StatelessWidget {
                       characterInfo('Actor/Actress : ', character.actorName),
                       buildDivider(230),
                       const SizedBox(height: 20),
+                      BlocBuilder<CharacterCubit, CharacterState>(
+                        builder: (context, state) {
+                          return checkIfQuotesAreLoaded(state);
+                        },
+                      )
                     ],
                   ),
                 ),

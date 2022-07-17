@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_breaking_bad/constants/colors.dart';
-import 'package:flutter_breaking_bad/constants/strings.dart';
+import '../../constants/colors.dart';
+import '../../constants/strings.dart';
 
-import 'package:flutter_breaking_bad/data/models/characters.dart';
+import '../../data/models/characters.dart';
 
 class CharacterItem extends StatelessWidget {
   final Character character;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_breaking_bad/app_routes.dart';
+import 'app_routes.dart';
 
 void main() {
   runApp(BreakingBadApp(

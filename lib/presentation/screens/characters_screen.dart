@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_breaking_bad/business_logic/cubit/character_cubit.dart';
-import 'package:flutter_breaking_bad/constants/colors.dart';
-import 'package:flutter_breaking_bad/data/models/characters.dart';
-import 'package:flutter_breaking_bad/presentation/widgets/character_item.dart';
+import '../../business_logic/cubit/character_cubit.dart';
+import '../../constants/colors.dart';
+import '../../data/models/characters.dart';
+import '../widgets/character_item.dart';
+import 'package:flutter_offline/flutter_offline.dart';
 
 class CharactersScreen extends StatefulWidget {
   const CharactersScreen({Key? key}) : super(key: key);
@@ -167,6 +168,28 @@ class _CharactersScreenState extends State<CharactersScreen> {
     );
   }
 
+  Widget buildNoInternetWidget() {
+    return Center(
+      child: Container(
+        color: Colors.white,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(height: 20),
+            const Text(
+              'Can\'t connect to the internet',
+              style: TextStyle(
+                fontSize: 22,
+                color: MyColors.grey,
+              ),
+            ),
+            Image.asset('assets/images/noFound.png')
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -181,7 +204,17 @@ class _CharactersScreenState extends State<CharactersScreen> {
         title: isSearching ? buildSearchField() : buildAppBarTitle(),
         actions: buildAppBarActions(),
       ),
-      body: buildBlocWidget(),
+      body: OfflineBuilder(
+        connectivityBuilder: ((context, connectivity, child) {
+          final bool connected = connectivity != ConnectivityResult.none;
+          if (connected) {
+            return buildBlocWidget();
+          } else {
+            return buildNoInternetWidget();
+          }
+        }),
+        child: showLoadingIndicator(),
+      ),
     );
   }
 }

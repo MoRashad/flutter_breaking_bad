@@ -1,5 +1,6 @@
-import 'package:flutter_breaking_bad/data/models/characters.dart';
-import 'package:flutter_breaking_bad/data/web_services/characters_web_services.dart';
+import '../models/characters.dart';
+import '../models/qoutes.dart';
+import '../web_services/characters_web_services.dart';
 
 class CharactersRepository {
   final CharactersWebService charactersWebService;
@@ -12,5 +13,11 @@ class CharactersRepository {
     return characters
         .map((character) => Character.fromJson(character))
         .toList();
+  }
+
+  Future<List<Quote>> getCharacterQuotes(String charName) async {
+    final quotes = await charactersWebService.getCharacterQuotes(charName);
+
+    return quotes.map((quote) => Quote.fromJson(quote)).toList();
   }
 }
